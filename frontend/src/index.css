@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Custom Base Styles */
+body {
+  @apply bg-gray-50 text-gray-900 font-sans;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold;
+}
+
+a {
+  @apply text-blue-600 hover:underline;
+}
+
+/* Optional: Custom Button Class (if used in many places) */
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition;
+}
