@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Models;
+using backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Controllers;
 
