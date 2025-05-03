@@ -1,6 +1,11 @@
 @backend_HostAddress = http://localhost:5177
 
+### Get all products
 GET {{backend_HostAddress}}/api/products
+Accept: application/json
+
+### Get a product by ID
+GET {{backend_HostAddress}}/api/products/1005
 Accept: application/json
 
 ### Create a new product
@@ -9,11 +14,28 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Levis Jeans",
-  "description": "Jeans for all occasions",
-  "price": 19.99,
-  "stock":"1",
-  "categoryId":1
+  "name": "Emporio Armani",
+  "description": "Slim fit jeans - denim blue",
+  "price": 146.99,
+  "stock":"10",
+  "categoryId":1,
+  "imageUrl": "https://img01.ztat.net/article/spp-media-p1/a99c461c341c3fc8b033961a0361f9de/2cec19e977f54dfe82da36df33b5d1fd.jpg?imwidth=300&filter=packshot",
+  "thumbnailUrl": "https://img01.ztat.net/article/spp-media-p1/a99c461c341c3fc8b033961a0361f9de/2cec19e977f54dfe82da36df33b5d1fd.jpg?imwidth=50&filter=packshot",
+}
+### Update a product
+PUT {{backend_HostAddress}}/api/products/1004
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 1005,
+  "name": "Bershka",
+  "description": "BAGGY - Relaxed fit jeans - light blue",
+  "price": 276.99,
+  "stock": 10,
+  "imageUrl": "https://img01.ztat.net/article/spp-media-p1/40b0685382d14bfdbb0f2a0daeb67c1b/c5588d5cc61b4a59adb3210f50d2b38c.jpg?imwidth=300&filter=packshot",
+  "thumbnailUrl": "https://img01.ztat.net/article/spp-media-p1/40b0685382d14bfdbb0f2a0daeb67c1b/c5588d5cc61b4a59adb3210f50d2b38c.jpg?imwidth=50&filter=packshot",
+  "categoryId": 1,
 }
 
 ### Get all categories

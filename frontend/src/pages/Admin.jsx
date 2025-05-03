@@ -3,7 +3,15 @@ import api from "../api/api";
 
 export default function AdminPanel() {
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: "", description: "", price: 0, stock: 0 });
+  const [form, setForm] = useState({ 
+    name: "", 
+    description: "", 
+    imageUrl: "", 
+    thumbnailUrl: "", 
+    price: 0, 
+    stock: 0,
+    categoryId: 1
+  });
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
@@ -27,11 +35,20 @@ export default function AdminPanel() {
   const handleSubmit = async () => {
     try {
       if (editingId) {
+        form.id = editingId;
+        form.categoryId = 1;
         await api.put(`/products/${editingId}`, form);
       } else {
         await api.post("/products", { ...form, categoryId: 1 });
       }
-      setForm({ name: "", description: "", price: 0, stock: 0 });
+      setForm({ 
+        name: "", 
+        description: "", 
+        imageUrl: "", 
+        thumbnailUrl: "", 
+        price: 0, 
+        stock: 0 
+      });
       setEditingId(null);
       loadProducts();
     } catch (err) {
@@ -43,6 +60,8 @@ export default function AdminPanel() {
     setForm({
       name: product.name,
       description: product.description,
+      imageUrl: product.imageUrl,
+      thumbnailUrl: product.thumbnailUrl,
       price: product.price,
       stock: product.stock,
     });
@@ -76,6 +95,20 @@ export default function AdminPanel() {
           value={form.description}
           onChange={handleChange}
           placeholder="Description"
+          className="input mb-2"
+        />
+        <textarea
+          name="imageUrl"
+          value={form.imageUrl}
+          onChange={handleChange}
+          placeholder="Image URL"
+          className="input mb-2"
+        />
+        <textarea
+          name="thumbnailUrl"
+          value={form.thumbnailUrl}
+          onChange={handleChange}
+          placeholder="Thumbnail URL"
           className="input mb-2"
         />
         <input
@@ -136,132 +169,3 @@ export default function AdminPanel() {
     </div>
   );
 }
-
-// import { useEffect, useState } from "react";
-// import api from "../api/api";
-
-// export default function Admin() {
-//   const [products, setProducts] = useState([]);
-//   const [form, setForm] = useState({ name: "", description: "", price: 0, stock: 0 });
-
-//   // Fetch products on load
-//   useEffect(() => {
-//     loadProducts();
-//   }, []);
-
-//   const loadProducts = async () => {
-//     try {
-//       const res = await api.get("/products");
-//       setProducts(res.data);
-//     } catch (err) {
-//       console.error("Failed to fetch products:", err);
-//     }
-//   };
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setForm(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleAddProduct = async () => {
-//     try {
-//       await api.post("/products", { ...form, categoryId: 1 });
-//       setForm({ name: "", description: "", price: 0, stock: 0 });
-//       loadProducts();
-//     } catch (err) {
-//       console.error("Error adding product:", err);
-//     }
-//   };
-
-//   const handleDeleteProduct = async (id) => {
-//     try {
-//       await api.delete(`/products/${id}`);
-//       loadProducts();
-//     } catch (err) {
-//       console.error("Error deleting product:", err);
-//     }
-//   };
-
-//   const handleUpdateProduct = async (id) => {
-//     try {
-//       await api.put(`/products/${id}`, form);
-//       setForm({ name: "", description: "", price: 0, stock: 0 });
-//       loadProducts();
-//     } catch (err) {
-//       console.error("Error updating product:", err);
-//     }
-//   };
-
-//   const handleSelectProduct = (product) => {
-//     setForm({
-//       name: product.name,
-//       description: product.description,
-//       price: product.price,
-//       stock: product.stock,
-//     });
-//   };
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">🛠 Admin Panel - Products</h1>
-
-//       {/* Product Form */}
-//       <div className="bg-white p-4 rounded shadow mb-6">
-//         <h2 className="text-lg font-semibold mb-2">Add / Edit Product</h2>
-//         <input
-//           type="text"
-//           name="name"
-//           placeholder="Name"
-//           value={form.name}
-//           onChange={handleInputChange}
-//           className="input mb-2"
-//         />
-//         <textarea
-//           name="description"
-//           placeholder="Description"
-//           value={form.description}
-//           onChange={handleInputChange}
-//           className="input mb-2"
-//         />
-//         <input
-//           type="number"
-//           name="price"
-//           placeholder="Price"
-//           value={form.price}
-//           onChange={handleInputChange}
-//           className="input mb-2"
-//         />
-//         <input
-//           type="number"
-//           name="stock"
-//           placeholder="Stock"
-//           value={form.stock}
-//           onChange={handleInputChange}
-//           className="input mb-2"
-//         />
-//         <div className="flex gap-2">
-//           <button onClick={handleAddProduct} className="btn-primary">Add Product</button>
-//           <button onClick={() => handleUpdateProduct(form.id)} className="btn-primary bg-yellow-500 hover:bg-yellow-600">Update</button>
-//         </div>
-//       </div>
-
-//       {/* Product List */}
-//       <h2 className="text-xl font-semibold mb-2">Product List</h2>
-//       <div className="grid gap-4">
-//         {products.map(product => (
-//           <div key={product.id} className="bg-white p-4 rounded shadow flex justify-between items-center">
-//             <div>
-//               <h3 className="font-bold">{product.name}</h3>
-//               <p className="text-sm text-gray-600">{product.description}</p>
-//               <p className="text-green-600 font-semibold">${product.price} — {product.stock} in stock</p>
-//             </div>
-//             <div className="flex gap-2">
-//               <button onClick={() => handleSelectProduct(product)} className="btn-primary bg-yellow-500 hover:bg-yellow-600">Edit</button>
-//               <button onClick={() => handleDeleteProduct(product.id)} className="btn-danger">Delete</button>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
