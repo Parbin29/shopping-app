@@ -1,14 +1,41 @@
+// import { Link } from "react-router-dom";
+
+// export default function Header() {
+//   return (
+//     <header className="bg-blue-600 text-white p-4 flex justify-between">
+//       <div className="text-xl font-bold">ShoppingSite</div>
+//       <nav>
+//         <Link to="/" className="mr-4">Home</Link>
+//         <Link to="/cart" className="mr-4">Cart</Link>
+//         <Link to="/admin">Admin</Link>
+//       </nav>
+//     </header>
+//   );
+// }
+
 import { Link } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ cartCount = 0 }) {
   return (
-    <header className="bg-blue-600 text-white p-4 flex justify-between">
-      <div className="text-xl font-bold">ShoppingSite</div>
-      <nav>
-        <Link to="/" className="mr-4">Home</Link>
-        <Link to="/cart" className="mr-4">Cart</Link>
-        <Link to="/admin">Admin</Link>
-      </nav>
+    <header className="bg-white shadow sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <Link to="/" className="text-2xl font-bold text-blue-600">
+          ShopZone
+        </Link>
+
+        <nav className="flex items-center space-x-6 text-sm font-medium text-gray-700">
+          <Link to="/" className="hover:text-blue-600">Home</Link>          
+          <Link to="/admin" className="hover:text-blue-600">Admin</Link>
+          <Link to="/cart" className="relative hover:text-blue-600">
+            Cart
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }

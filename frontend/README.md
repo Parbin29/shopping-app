@@ -53,3 +53,23 @@ git remote add origin https://github.com/Parbin29/shopping-app.git
 git branch -M main
 git push -u origin main
 ```
+
+### Install Tailwind CSS via npm
+```bash
+pnpm install -D tailwindcss postcss autoprefixer
+```
+
+# Initialize Tailwind CSS configuration
+```bash
+pnpm install @tailwindcss/cli
+npx @tailwindcss/cli
+```
+
+``````javascript
+module.exports = {
+  content: ["./src/**/*.{html,js}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};

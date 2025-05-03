@@ -15,3 +15,12 @@ dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
 dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
+
+### Run the app
+```bash
+dotnet watch run
+```
+
+### Use swagger
+http://localhost:5177/swagger/index.html
+

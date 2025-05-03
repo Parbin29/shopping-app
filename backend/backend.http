@@ -1,6 +1,32 @@
 @backend_HostAddress = http://localhost:5177
 
-GET {{backend_HostAddress}}/weatherforecast/
+GET {{backend_HostAddress}}/api/products
 Accept: application/json
+
+### Create a new product
+POST {{backend_HostAddress}}/api/products
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Levis Jeans",
+  "description": "Jeans for all occasions",
+  "price": 19.99,
+  "stock":"1",
+  "categoryId":1
+}
+
+### Get all categories
+GET {{backend_HostAddress}}/api/categories
+Accept: application/json
+
+### Create a new product
+POST {{backend_HostAddress}}/api/categories
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Men Clothing",
+}
 
 ###
