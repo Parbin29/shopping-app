@@ -10,5 +10,5 @@ public class Review
     public Product? Product { get; set; }
 
     public int UserId { get; set; }
-    public User? User { get; set; }
+    public ApplicationUser? User { get; set; }
 }
