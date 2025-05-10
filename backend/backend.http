@@ -14,14 +14,15 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Emporio Armani",
-  "description": "Slim fit jeans - denim blue",
-  "price": 146.99,
-  "stock":"10",
-  "categoryId":1,
-  "imageUrl": "https://img01.ztat.net/article/spp-media-p1/a99c461c341c3fc8b033961a0361f9de/2cec19e977f54dfe82da36df33b5d1fd.jpg?imwidth=300&filter=packshot",
-  "thumbnailUrl": "https://img01.ztat.net/article/spp-media-p1/a99c461c341c3fc8b033961a0361f9de/2cec19e977f54dfe82da36df33b5d1fd.jpg?imwidth=50&filter=packshot",
+  "name": "Wrangler Jeans",
+    "description": "TEXAS - Straight leg jeans - darkstone",
+    "price": 79,
+    "stock": 10,
+    "imageUrl": "https://img01.ztat.net/article/spp-media-p1/4a8b787eda763451a672a79d46df0e9b/a1773ff24f0940d7b7f709117778c39e.jpg?imwidth=300&filter=packshot",
+    "thumbnailUrl": "https://img01.ztat.net/article/spp-media-p1/4a8b787eda763451a672a79d46df0e9b/a1773ff24f0940d7b7f709117778c39e.jpg?imwidth=50&filter=packshot",
+    "categoryId": 1,
 }
+
 ### Update a product
 PUT {{backend_HostAddress}}/api/products/1004
 Accept: application/json
@@ -48,7 +49,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Men Clothing",
+  "name": "Women Clothing",
 }
 
 ###

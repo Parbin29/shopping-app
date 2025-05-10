@@ -4,7 +4,9 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
+// import User from "./pages/User";
 import RegisterUser from "./components/RegisterUser";
+import Login from "./components/Login";
 import { CartProvider } from "./context/CartContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -30,6 +32,7 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/register" element={<RegisterUser />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>

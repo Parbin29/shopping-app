@@ -42,24 +42,47 @@ namespace backend.Controllers
             return Ok("ApplicationUser registered successfully");
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var user = await _userManager.FindByNameAsync(dto.UserName);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+                return Unauthorized("Invalid username or password");
+
+            // Generate token or simply return success
+            return Ok(new
+            {
+                user.UserName,
+                user.Email,
+                Message = "Login successful"
+            });
+        }
+
+
+
         private string HashPassword(string password)
         {
-                using var sha256 = SHA256.Create();
-                var bytes = Encoding.UTF8.GetBytes(password);
-                var hash = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
+            using var sha256 = SHA256.Create();
+            var bytes = Encoding.UTF8.GetBytes(password);
+            var hash = sha256.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
     }
 
-    
+
 
     public class RegisterDto
     {
         public string UserName { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }
-        
     }
 
-    
+    public class LoginDto
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
+
 }
