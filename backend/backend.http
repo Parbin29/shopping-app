@@ -5,7 +5,7 @@ GET {{backend_HostAddress}}/api/products
 Accept: application/json
 
 ### Get a product by ID
-GET {{backend_HostAddress}}/api/products/1005
+GET {{backend_HostAddress}}/api/products/1002
 Accept: application/json
 
 ### Create a new product

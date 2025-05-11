@@ -32,7 +32,7 @@ namespace backend
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            
+
             // 2. Add Identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
@@ -79,12 +79,13 @@ namespace backend
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();  // To serve wwwroot/images
             app.UseHttpsRedirection();
             app.UseCors("AllowAll");
             app.UseRouting();
             app.UseAuthentication(); // <- Required for Identity
             app.UseAuthorization();
-            
+
             app.MapControllers();
             app.MapHub<NotificationHub>("/notifications");
             app.Run();
