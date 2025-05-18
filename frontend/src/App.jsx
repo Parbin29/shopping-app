@@ -8,9 +8,12 @@ import Admin from "./pages/Admin";
 import RegisterUser from "./components/RegisterUser";
 import Login from "./components/Login";
 import { CartProvider } from "./context/CartContext";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import { isUserAuthenticated } from './auth/auth'; // adjust path as needed
 
 export default function App() {
+
   useEffect(() => {
     connection
       .start()
@@ -28,7 +31,12 @@ export default function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={
+            isUserAuthenticated()
+              ? <Navigate to="/home" replace />
+              : <Navigate to="/login" replace />
+          } />
+          <Route path="/home" element={<Home />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/register" element={<RegisterUser />} />

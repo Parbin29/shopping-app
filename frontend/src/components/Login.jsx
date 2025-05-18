@@ -14,7 +14,7 @@ function LoginPage() {
     e.preventDefault();
     try {
       await API.post("/auth/login", formData);
-      navigate("/"); // Redirect on successful login
+      navigate("/home"); // Redirect on successful login
     } catch (err) {
       setError(err.response?.data || "Login failed");
     }
