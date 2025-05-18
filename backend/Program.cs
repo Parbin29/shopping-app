@@ -42,48 +42,27 @@ namespace backend
             // .AddDefaultTokenProviders();
 
 
-            // 3. Configure Application Cookie to send 401 instead of redirecting
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    if (context.Request.Path.StartsWithSegments("/api") &&
-                        context.Response.StatusCode == StatusCodes.Status200OK)
-                    {
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        return Task.CompletedTask;
-                    }
-                    context.Response.Redirect(context.RedirectUri);
-                    return Task.CompletedTask;                
-                };
-
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                };
-            });
-            
-
+            // 3. Configure JWT Authentication | uncomment if using JWT
             // builder.Services.AddAuthentication();
             // builder.Services.AddAuthorization();
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-                    };
-                });
+            // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //     .AddJwtBearer(options =>
+            //     {
+            //         options.TokenValidationParameters = new TokenValidationParameters
+            //         {
+            //             ValidateIssuer = true,
+            //             ValidateAudience = true,
+            //             ValidateLifetime = true,
+            //             ValidateIssuerSigningKey = true,
+            //             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            //             ValidAudience = builder.Configuration["Jwt:Audience"],
+            //             IssuerSigningKey = new SymmetricSecurityKey(
+            //                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            //         };
+            //     });
 
+            builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
 
             builder.Services.AddSignalR();
@@ -102,18 +81,43 @@ namespace backend
             // 5. Configure authentication cookies (optional for login)
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/login";
-                options.ExpireTimeSpan = TimeSpan.FromDays(7);
-                options.SlidingExpiration = true;
+                // Configure Application Cookie to send 401 instead of redirecting
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api") &&
+                        context.Response.StatusCode == StatusCodes.Status200OK)
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
+
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                };
             });
 
-            // Enable CORS
+            // // Enable CORS
+            // builder.Services.AddCors(options =>
+            // {
+            //     options.AddPolicy("AllowAll",
+            //         policy => policy.AllowAnyOrigin()
+            //                         .AllowAnyMethod()
+            //                         .AllowAnyHeader());
+            // });
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
-                    policy => policy.AllowAnyOrigin()
-                                    .AllowAnyMethod()
-                                    .AllowAnyHeader());
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173") // frontend origin
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // Required for cookies
+                });
             });
 
             var app = builder.Build();
@@ -127,9 +131,10 @@ namespace backend
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("AllowFrontend");
             app.UseStaticFiles();  // To serve wwwroot/images
             app.UseHttpsRedirection();
-            app.UseCors("AllowAll");
+
             app.UseRouting();
             app.UseAuthentication(); // <- Required for Identity
             app.UseAuthorization();

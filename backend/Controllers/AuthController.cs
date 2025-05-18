@@ -7,7 +7,6 @@ using System.Text;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Controllers
 {
@@ -75,12 +74,18 @@ namespace backend.Controllers
 
             var token = GenerateJwtToken(user);
 
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // only if your site runs over HTTPS
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(60)
+            };
+
+            Response.Cookies.Append("jwt", token, cookieOptions);
+
             return Ok(new
             {
-                user.UserName,
-                user.Email,
-                token,
-                user.Role,
                 Message = "Login successful"
             });
         }

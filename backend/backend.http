@@ -1,12 +1,20 @@
 @backend_HostAddress = http://localhost:5177
 
+@API_TOKEN = {{dotenv token}}
+# @API_COOKIE = {{dotenv http-cookie}}
+@API_COOKIE = <<cookie_here>>
+
 ### Get all products
 GET {{backend_HostAddress}}/api/products
 Accept: application/json
+# Authorization: Bearer {{API_TOKEN}}
+Cookie: {{API_COOKIE}}
 
 ### Get a product by ID
-GET {{backend_HostAddress}}/api/products/1002
+GET {{backend_HostAddress}}/api/products/1003
 Accept: application/json
+# Authorization: Bearer {{API_TOKEN}}
+Cookie: {{API_COOKIE}}
 
 ### Create a new product
 POST {{backend_HostAddress}}/api/products
@@ -18,8 +26,8 @@ Content-Type: application/json
     "description": "TEXAS - Straight leg jeans - darkstone",
     "price": 79,
     "stock": 10,
-    "imageUrl": "https://img01.ztat.net/article/spp-media-p1/4a8b787eda763451a672a79d46df0e9b/a1773ff24f0940d7b7f709117778c39e.jpg?imwidth=300&filter=packshot",
-    "thumbnailUrl": "https://img01.ztat.net/article/spp-media-p1/4a8b787eda763451a672a79d46df0e9b/a1773ff24f0940d7b7f709117778c39e.jpg?imwidth=50&filter=packshot",
+    "imageUrl": "",
+    "thumbnailUrl": "",
     "categoryId": 1,
 }
 
@@ -34,22 +42,39 @@ Content-Type: application/json
   "description": "BAGGY - Relaxed fit jeans - light blue",
   "price": 276.99,
   "stock": 10,
-  "imageUrl": "https://img01.ztat.net/article/spp-media-p1/40b0685382d14bfdbb0f2a0daeb67c1b/c5588d5cc61b4a59adb3210f50d2b38c.jpg?imwidth=300&filter=packshot",
-  "thumbnailUrl": "https://img01.ztat.net/article/spp-media-p1/40b0685382d14bfdbb0f2a0daeb67c1b/c5588d5cc61b4a59adb3210f50d2b38c.jpg?imwidth=50&filter=packshot",
+  "imageUrl": "",
+  "thumbnailUrl": "",
   "categoryId": 1,
 }
 
 ### Get all categories
 GET {{backend_HostAddress}}/api/categories
 Accept: application/json
+Authorization: Bearer {{dotenv token}}
 
-### Create a new product
+### Get a category by ID
+GET {{backend_HostAddress}}/api/categories/2
+Accept: application/json
+Authorization: Bearer {{dotenv token}}
+
+### Create a new category
 POST {{backend_HostAddress}}/api/categories
 Accept: application/json
 Content-Type: application/json
 
 {
   "name": "Women Clothing",
+}
+
+
+### Login
+POST {{backend_HostAddress}}/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userName": "xyz",
+  "password": "xyz123"
 }
 
 ###
