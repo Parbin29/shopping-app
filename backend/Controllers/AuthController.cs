@@ -4,6 +4,10 @@ using backend.Models;
 using backend.Data;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Controllers
 {
@@ -12,10 +16,16 @@ namespace backend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IConfiguration _config;
 
-        public AuthController(UserManager<ApplicationUser> userManager)
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, IConfiguration config)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
+            _signInManager = signInManager;
+            _config = config;
         }
 
         [HttpPost("register")]
@@ -39,6 +49,12 @@ namespace backend.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
+            // Create role if it doesn't exist
+            await CreateRoleAsync(dto.Role);
+            // Assign role to user
+            await _userManager.AddToRoleAsync(user, dto.Role);
+            // Optionally, you can generate a token here and return it
+
             return Ok("ApplicationUser registered successfully");
         }
 
@@ -49,16 +65,35 @@ namespace backend.Controllers
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Unauthorized("Invalid username or password");
 
+            // signin user
+            var result = await _signInManager.PasswordSignInAsync(user, dto.Password, isPersistent: false, lockoutOnFailure: false);
+            if (!result.Succeeded)
+                return Unauthorized("Invalid username or password");
+
+
             // Generate token or simply return success
+
+            var token = GenerateJwtToken(user);
+
             return Ok(new
             {
                 user.UserName,
                 user.Email,
+                token,
+                user.Role,
                 Message = "Login successful"
             });
         }
 
-
+        // Create role async private method
+        private async Task CreateRoleAsync(string roleName)
+        {
+            if (!await _roleManager.RoleExistsAsync(roleName))
+            {
+                var role = new IdentityRole(roleName);
+                await _roleManager.CreateAsync(role);
+            }
+        }
 
         private string HashPassword(string password)
         {
@@ -67,9 +102,29 @@ namespace backend.Controllers
             var hash = sha256.ComputeHash(bytes);
             return Convert.ToBase64String(hash);
         }
+
+        private string GenerateJwtToken(IdentityUser user)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(double.Parse(_config["Jwt:ExpireMinutes"])),
+                signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
-
-
 
     public class RegisterDto
     {
@@ -84,5 +139,10 @@ namespace backend.Controllers
         public string Password { get; set; }
     }
 
-
+    
 }
+    
+
+
+
+

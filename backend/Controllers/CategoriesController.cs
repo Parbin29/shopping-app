@@ -4,6 +4,7 @@ using backend.Data;
 using backend.Models;
 using backend.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers;
 
@@ -11,10 +12,10 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
     private readonly IHubContext<NotificationHub> _hub;
 
-    public CategoriesController(AppDbContext context, IHubContext<NotificationHub> hub)
+    public CategoriesController(ApplicationDbContext context, IHubContext<NotificationHub> hub)
     {
         _context = context;
         _hub = hub;
@@ -36,6 +37,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Category>> CreateCategory(Category category)
     {
         _context.Categories.Add(category);

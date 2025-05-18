@@ -4,6 +4,8 @@ using backend.Data;
 using backend.Models;
 using backend.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers;
 
@@ -11,22 +13,24 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
     private readonly IHubContext<NotificationHub> _hub;
 
-    public ProductsController(AppDbContext context, IHubContext<NotificationHub> hub)
+    public ProductsController(ApplicationDbContext context, IHubContext<NotificationHub> hub)
     {
         _context = context;
         _hub = hub;
     }
 
     [HttpGet]
+    // [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
     {
         return await _context.Products.Include(p => p.Category).ToListAsync();
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
         var product = await _context.Products.Include(p => p.Category)
@@ -37,6 +41,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Product>> CreateProduct(Product product)
     {
         _context.Products.Add(product);
@@ -86,8 +91,14 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost("upload-image")]
-    public async Task<IActionResult> UploadImage([FromForm] IFormFile file)
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [Consumes("multipart/form-data")]
+    [Produces("application/json")]
+    [RequestSizeLimit(2 * 1024 * 1024)] // Limit to 2 MB
+    public async Task<IActionResult> UploadImage([FromForm] FileUploadDto uploadDto)
     {
+        var file = uploadDto.File;
+
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");
 
@@ -108,6 +119,12 @@ public class ProductsController : ControllerBase
         var imageUrl = $"/images/{uniqueFileName}";
 
         return Ok(new { imageUrl });
+    }
+
+    public class FileUploadDto
+    {
+        [Required]
+        public IFormFile File { get; set; }
     }
 
 }
