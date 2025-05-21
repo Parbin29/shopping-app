@@ -30,64 +30,87 @@ namespace backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var userExists = await _userManager.FindByNameAsync(dto.UserName);
-            if (userExists != null)
-                return BadRequest("ApplicationUser already exists");
-
-
-            var hashedPassword = HashPassword(dto.Password);
-            var user = new ApplicationUser
+            try
             {
-                UserName = dto.UserName,
-                PasswordHash = hashedPassword,
-                Role = dto.Role
-            };
+                var userExists = await _userManager.FindByNameAsync(dto.UserName);
+                if (userExists != null)
+                    return BadRequest("ApplicationUser already exists");
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
+                var hashedPassword = HashPassword(dto.Password);
+                var user = new ApplicationUser
+                {
+                    UserName = dto.UserName,
+                    PasswordHash = hashedPassword,
+                    Role = dto.Role
+                };
 
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+                var result = await _userManager.CreateAsync(user, dto.Password);
 
-            // Create role if it doesn't exist
-            await CreateRoleAsync(dto.Role);
-            // Assign role to user
-            await _userManager.AddToRoleAsync(user, dto.Role);
-            // Optionally, you can generate a token here and return it
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors);
 
-            return Ok("ApplicationUser registered successfully");
+                // Create role if it doesn't exist
+                await CreateRoleAsync(dto.Role);
+                // Assign role to user
+                await _userManager.AddToRoleAsync(user, dto.Role);
+                // Optionally, you can generate a token here and return it
+
+                return Ok("ApplicationUser registered successfully");
+            }
+            catch (Exception)
+            {
+                // Optionally log the exception here
+                return StatusCode(500, "Registration failed. Please try again later.");
+            }
+
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var user = await _userManager.FindByNameAsync(dto.UserName);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                return Unauthorized("Invalid username or password");
-
-            // signin user
-            var result = await _signInManager.PasswordSignInAsync(user, dto.Password, isPersistent: false, lockoutOnFailure: false);
-            if (!result.Succeeded)
-                return Unauthorized("Invalid username or password");
-
-
-            // Generate token or simply return success
-
-            var token = GenerateJwtToken(user);
-
-            var cookieOptions = new CookieOptions
+            try
             {
-                HttpOnly = true,
-                Secure = false, // only if your site runs over HTTPS
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(60)
-            };
+                var user = await _userManager.FindByNameAsync(dto.UserName);
+                if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+                    return Unauthorized("Invalid username or password");
 
-            Response.Cookies.Append("jwt", token, cookieOptions);
+                // signin user
+                var result = await _signInManager.PasswordSignInAsync(user, dto.Password, isPersistent: false, lockoutOnFailure: false);
+                if (!result.Succeeded)
+                    return Unauthorized("Invalid username or password");
 
-            return Ok(new
+
+                // Generate token or simply return success
+
+                var token = GenerateJwtToken(user);
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false, // only if your site runs over HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(60)
+                };
+
+                Response.Cookies.Append("jwt", token, cookieOptions);
+
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                });
+            }
+            catch (Microsoft.Data.SqlClient.SqlException)
             {
-                Message = "Login successful"
-            });
+                // Database connection or SQL error
+                return StatusCode(500, "A database error occurred. Please try again later.");
+            }
+            catch (Exception)
+            {
+                // Other unhandled errors
+                return StatusCode(500, "An internal server error occurred. Please try again later.");
+            }
         }
 
         // Create role async private method
@@ -144,9 +167,9 @@ namespace backend.Controllers
         public string Password { get; set; }
     }
 
-    
+
 }
-    
+
 
 
 

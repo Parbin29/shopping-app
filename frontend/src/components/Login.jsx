@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import API from "../api/api";
 import { useNavigate, Link } from "react-router-dom";
 
+
 function LoginPage() {
   const [formData, setFormData] = useState({ userName: "", password: "" });
   const [error, setError] = useState(null);
@@ -13,7 +14,14 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/auth/login", formData);
+      const res = await API.post("/auth/login", formData);
+      const userInfo = {
+        userName: res.data.userName,
+        userId: res.data.userId,
+      }
+console.log(userInfo);
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      
       navigate("/home"); // Redirect on successful login
     } catch (err) {
       setError(err.response?.data || "Login failed");

@@ -1,15 +1,9 @@
 export default function ProductCard({ product, onAddToCart }) {
   return (
     <div className="card">
-      {/* <img
-        src={product.imageUrl || "https://via.placeholder.com/300"}
-        alt={product.name}
-        className="w-auto h-auto object-cover rounded-xl mb-2"
-      /> */}
       {product.imageUrl && (
         <img
           src={`http://localhost:5177${product.imageUrl}`}
-          // src={product.imageUrl || "https://via.placeholder.com/300"}
           alt={product.name}
           className="w-auto h-auto object-cover rounded-xl mb-2"
         />
@@ -19,12 +13,16 @@ export default function ProductCard({ product, onAddToCart }) {
       <div className="text-green-600 font-bold mb-4">
         ${product.price.toFixed(2)}
       </div>
-      <button
-        onClick={() => onAddToCart(product)}
-        className="btn-primary w-auto"
-      >
-        Add to Cart
-      </button>
+      
+        <div className="mt-auto flex justify-end pb-4">
+          <button
+            onClick={() => onAddToCart(product)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md"
+          >
+            Add to Cart
+          </button>
+        </div>
+      {/* </div> */}
     </div>
   );
 }
