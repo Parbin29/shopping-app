@@ -20,6 +20,9 @@ export default function Header({ cartCount = 0 }) {
             )}
           </Link>
           <Link to="/login" className="hover:text-blue-600">Login</Link>
+          <Link to="/orders" className="hover:text-blue-600">
+            Orders
+          </Link>
         </nav>
       </div>
     </header>

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import connection from "./signalr/connection";
 import Header from "./components/Header";
+import OrderHistory from "./components/OrderHistory";
 import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
@@ -26,6 +27,8 @@ export default function App() {
       .catch(err => console.error("SignalR Connection Error:", err));
   }, []);
 
+ 
+
   return (
     <CartProvider>
       <BrowserRouter>
@@ -41,6 +44,7 @@ export default function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/register" element={<RegisterUser />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/orders" element={<OrderHistory/>} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
