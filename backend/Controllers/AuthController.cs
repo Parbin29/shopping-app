@@ -19,12 +19,15 @@ namespace backend.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _config;
 
-        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, IConfiguration config)
+        private readonly ApplicationDbContext _context;
+
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, IConfiguration config, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _config = config;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -86,10 +89,10 @@ namespace backend.Controllers
 
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,
+                    // HttpOnly = true,
                     Secure = false, // only if your site runs over HTTPS
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddMinutes(60)
+                    // Expires = DateTime.UtcNow.AddMinutes(60)
                 };
 
                 Response.Cookies.Append("jwt", token, cookieOptions);

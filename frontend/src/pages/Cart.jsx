@@ -14,10 +14,7 @@ console.log(user);
     try {
 
       const response = await api.post("/cart/checkout", {
-        //TODO - use userId from context or default to "guest"
-        userId: 1,
-        //  userId: user.userId || "xyz", // Use userId from context or default to "guest"
-        // userId: user.userName || "f11875ce-8af5-4a5e-aa0d-50fd3e29fcdc", // Use userId from context or default to "guest"
+         userId: user.userId,
         items: cart.map((item) => ({
           productId: item.id,
           quantity: item.quantity,

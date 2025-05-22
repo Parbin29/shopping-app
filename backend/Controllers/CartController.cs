@@ -5,6 +5,7 @@ using backend.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -19,6 +20,31 @@ namespace backend.Controllers
             _context = context;
         }
 
+        [HttpGet("items/{userId}")]
+        public async Task<ActionResult<IEnumerable<OrderItem>>> GetCartItems(string userId)
+        {
+            var cartItems = await _context.Orders
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+                .Where(o => o.ApplicationUserId == userId)
+                .SelectMany(o => o.Items)
+                .Select(i => new OrderItem
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Product = new Product
+                    {
+                        Id = i.Product.Id,
+                        Name = i.Product.Name,
+                        Price = i.Product.Price,
+                        ImageUrl = i.Product.ImageUrl
+                    }
+                })
+                .ToListAsync();
+            return cartItems;
+        }
+
+
         [Authorize]
         [HttpPost("checkout")]
         public async Task<IActionResult> Checkout(CheckoutDto dto)
@@ -29,8 +55,9 @@ namespace backend.Controllers
             var order = new Order
             {
                 //TODO : Testing | Remove hardcoded UserId
-                // UserId = dto.UserId,
-                UserId = 1,
+                // UserId = 1,
+                ApplicationUserId = dto.UserId,
+                
                 OrderedAt = DateTime.UtcNow,
                 Items = dto.Items.Select(i => new OrderItem
                 {

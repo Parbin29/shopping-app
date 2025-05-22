@@ -41,27 +41,6 @@ namespace backend
             .AddEntityFrameworkStores<ApplicationDbContext>();
             // .AddDefaultTokenProviders();
 
-
-            // 3. Configure JWT Authentication | uncomment if using JWT
-            // builder.Services.AddAuthentication();
-            // builder.Services.AddAuthorization();
-
-            // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //     .AddJwtBearer(options =>
-            //     {
-            //         options.TokenValidationParameters = new TokenValidationParameters
-            //         {
-            //             ValidateIssuer = true,
-            //             ValidateAudience = true,
-            //             ValidateLifetime = true,
-            //             ValidateIssuerSigningKey = true,
-            //             ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            //             ValidAudience = builder.Configuration["Jwt:Audience"],
-            //             IssuerSigningKey = new SymmetricSecurityKey(
-            //                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-            //         };
-            //     });
-
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
 
@@ -72,6 +51,7 @@ namespace backend
             // 4. (Optional) Configure password and user options
             builder.Services.Configure<IdentityOptions>(options =>
             {
+                // Password settings.
                 options.Password.RequireDigit = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
@@ -81,6 +61,10 @@ namespace backend
             // 5. Configure authentication cookies (optional for login)
             builder.Services.ConfigureApplicationCookie(options =>
             {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+
                 // Configure Application Cookie to send 401 instead of redirecting
                 options.Events.OnRedirectToLogin = context =>
                 {
@@ -101,14 +85,7 @@ namespace backend
                 };
             });
 
-            // // Enable CORS
-            // builder.Services.AddCors(options =>
-            // {
-            //     options.AddPolicy("AllowAll",
-            //         policy => policy.AllowAnyOrigin()
-            //                         .AllowAnyMethod()
-            //                         .AllowAnyHeader());
-            // });
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
@@ -128,14 +105,18 @@ namespace backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
 
+                // app.UseMigrationsEndPoint();
+
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseCors("AllowFrontend");
-            app.UseStaticFiles();  // To serve wwwroot/images
+
             app.UseHttpsRedirection();
+            app.UseStaticFiles();  // To serve wwwroot/images
 
             app.UseRouting();
+
             app.UseAuthentication(); // <- Required for Identity
             app.UseAuthorization();
 

@@ -3,7 +3,7 @@ namespace backend.Models;
 
 public class CheckoutDto
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; } = "";
     public List<CartItemDto> Items { get; set; }
 }
 
