@@ -20,28 +20,29 @@ namespace backend.Controllers
             _context = context;
         }
 
-        [HttpGet("items/{userId}")]
-        public async Task<ActionResult<IEnumerable<OrderItem>>> GetCartItems(string userId)
+        [Authorize]
+        [HttpGet("users/{userId}")]
+        public async Task<IActionResult> GetUserOrders(string userId)
         {
-            var cartItems = await _context.Orders
-                .Include(o => o.Items)
-                .ThenInclude(i => i.Product)
+            var orders = await _context.Orders
                 .Where(o => o.ApplicationUserId == userId)
-                .SelectMany(o => o.Items)
-                .Select(i => new OrderItem
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Product = new Product
-                    {
-                        Id = i.Product.Id,
-                        Name = i.Product.Name,
-                        Price = i.Product.Price,
-                        ImageUrl = i.Product.ImageUrl
-                    }
-                })
+                .Include(o => o.Items)
+                .ThenInclude(oi => oi.Product)
+                .OrderByDescending(o => o.OrderedAt)
                 .ToListAsync();
-            return cartItems;
+
+            return Ok(orders.Select(o => new
+            {
+                o.Id,
+                o.OrderedAt,
+                Items = o.Items.Select(i => new
+                {
+                    i.Product.Name,
+                    i.Quantity,
+                    i.Product.Price
+                }),
+                Total = o.Items.Sum(i => i.Quantity * i.Product.Price)
+            }));
         }
 
 
@@ -57,7 +58,7 @@ namespace backend.Controllers
                 //TODO : Testing | Remove hardcoded UserId
                 // UserId = 1,
                 ApplicationUserId = dto.UserId,
-                
+
                 OrderedAt = DateTime.UtcNow,
                 Items = dto.Items.Select(i => new OrderItem
                 {
